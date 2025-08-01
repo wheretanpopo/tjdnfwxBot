@@ -4,6 +4,7 @@
 
 import requests
 import datetime
+from zoneinfo import ZoneInfo # 시간대 정보 라이브러리
 from imgurpython import ImgurClient
 from pathlib import Path
 
@@ -231,7 +232,7 @@ class InstagramAPI:
         """
         # 주 언어의 캐치프레이즈를 메인으로 사용
         main_phrase = lang_data.get(primary_lang, {}).get('catch_phrase', 'Great weather today!')
-        date_str = datetime.datetime.now().strftime('%B %d, %Y')
+        date_str = datetime.datetime.now(ZoneInfo("Asia/Seoul")).strftime('%B %d, %Y')
         
         # 기본 캡션 구성
         caption_parts = [
@@ -239,10 +240,11 @@ class InstagramAPI:
             f"✨ {main_phrase}",
             "",
             "🌤️ Today's Weather Forecast",
+            "🇰🇷 Korean | 🇺🇸 English versions",
             "",
             "#WeatherForecast #Seoul #DailyWeather",
-            "#날씨예보 #서울날씨 #오늘의날씨 #날씨씨",
-            "#WeatherUpdate #KoreaWeather #Weather"
+            "#날씨예보 #서울날씨 #오늘의날씨",
+            "#WeatherUpdate #KoreaWeather #InstagramWeather"
         ]
         
         return "\n".join(caption_parts)
@@ -261,7 +263,7 @@ def post_daily_weather(instagram_api, generated_images, lang_data):
         print("❌ 생성된 이미지가 없습니다.")
         return False
         
-    current_day = datetime.datetime.now().day
+    current_day = datetime.datetime.now(ZoneInfo("Asia/Seoul")).day
     
     # 홀수날: 한국어 우선, 짝수날: 영어 우선
     if current_day % 2 == 1:  # 홀수날
@@ -307,9 +309,10 @@ def post_daily_weather(instagram_api, generated_images, lang_data):
                 success = False
         
         # 2. 스토리 포스팅 (한국어 버전 우선)
-        if 'ko' in generated_images and generated_images['ko']:
-            print("-> 스토리 포스팅 시작 (한국어 버전)")
-            story_result = instagram_api.post_story(generated_images['ko'])
+        story_image_to_post = generated_images.get('story_ko') or generated_images.get('ko')
+        if story_image_to_post:
+            print(f"-> 스토리 포스팅 시작 ({'전용 이미지' if 'story_ko' in generated_images else '포스트 이미지 사용'})")
+            story_result = instagram_api.post_story(story_image_to_post)
             
             if story_result:
                 print(f"✅ 스토리 포스팅 성공! ID: {story_result}")

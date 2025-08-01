@@ -5,6 +5,7 @@
 import datetime
 import json
 from pathlib import Path
+from zoneinfo import ZoneInfo # 시간대 정보 라이브러리
 
 # 설정 및 API 클라이언트 모듈 임포트
 from config import (
@@ -39,7 +40,7 @@ def get_base_datetime():
     KMA API 호출을 위한 적절한 기준 날짜와 시간을 계산합니다.
     API 데이터 생성 지연(약 15분)을 고려하여 현재 시간에서 20분을 뺀 시간을 기준으로, 요청 가능한 가장 최신 시간을 결정합니다.
     """
-    now = datetime.datetime.now()
+    now = datetime.datetime.now(ZoneInfo("Asia/Seoul")) # 한국 시간 기준
     base_criteria_time = now - datetime.timedelta(minutes=20)
     available_hours = [2, 5, 8, 11, 14, 17, 20, 23]
     
@@ -88,9 +89,10 @@ def main():
     """
     메인 실행 함수
     """
-    # 1. 날짜 및 시간 설정
+    # 1. 날짜 및 시간 설정 (한국 시간 기준)
+    kst = ZoneInfo("Asia/Seoul")
     base_date, base_time = get_base_datetime()
-    target_date = datetime.datetime.now().strftime("%Y%m%d")
+    target_date = datetime.datetime.now(kst).strftime("%Y%m%d")
     yesterday_temps = load_yesterday_temps() # 어제 최고/최저 기온 모두 로드
     
     print("="*50)
@@ -208,6 +210,12 @@ def main():
         if image_path:
             generated_images[lang] = image_path
             print(f" -> {lang.upper()} 이미지 생성 완료: {image_path}")
+
+            # 한국어 포스트 이미지가 생성되면, 바로 스토리용 이미지도 생성
+            if lang == 'ko':
+                story_image_path = img_gen.create_story_from_post(image_path)
+                if story_image_path:
+                    generated_images['story_ko'] = story_image_path
         else:
             print(f" -> ❌ {lang.upper()} 이미지 생성 실패")
 

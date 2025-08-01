@@ -593,6 +593,43 @@ class ImageGenerator:
         """스토리 이미지 생성 (향후 구현)"""
         print(f"스토리 이미지 생성은 현재 구현되지 않았습니다 ({language}).")
         return None, None
+
+    def create_story_from_post(self, post_image_path):
+        """생성된 포스트 이미지를 잘리지 않게 스토리 규격으로 변환합니다."""
+        if not post_image_path or not Path(post_image_path).exists():
+            print("❌ 원본 포스트 이미지가 없어 스토리 이미지를 생성할 수 없습니다.")
+            return None
+
+        print(f"→ 포스트 이미지를 스토리 규격으로 변환 시작: {post_image_path}")
+
+        # 1. 검은색 스토리 배경 생성 (1080x1920)
+        story_bg = Image.new("RGBA", (1080, 1920), (0, 0, 0, 255))
+
+        # 2. 포스트 이미지 불러오기
+        post_img = Image.open(post_image_path).convert("RGBA")
+
+        # 3. 포스트 이미지를 중앙에 위치시킬 좌표 계산
+        # x 좌표는 (1080 - 1080) / 2 = 0
+        # y 좌표는 (1920 - 1350) / 2 = 285
+        paste_position = (0, 285)
+
+        # 4. 배경 위에 포스트 이미지 붙여넣기
+        story_bg.paste(post_img, paste_position)
+
+        # 5. 새 스토리 이미지 저장
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+        timestamp = datetime.datetime.now(ZoneInfo("Asia/Seoul")).strftime("%Y%m%d_%H%M%S")
+        # 원본 파일명에서 언어 코드 추출
+        language = Path(post_image_path).stem.split('_')[2]
+        output_path = self.output_dir / f"weather_story_{language}_{timestamp}.png"
+
+        try:
+            story_bg.save(output_path, "PNG")
+            print(f"✅ 스토리 규격 이미지 생성 완료: {output_path}")
+            return output_path
+        except Exception as e:
+            print(f"❌ 스토리 규격 이미지 저장 실패: {e}")
+            return None
         
     def test_coordinates(self):
         """좌표 테스트 (향후 구현)"""
