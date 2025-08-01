@@ -1,0 +1,6 @@
+requests
+Pillow
+pilmoji==2.0.4
+emoji==2.10.1
+python-dotenv
+imgurpython

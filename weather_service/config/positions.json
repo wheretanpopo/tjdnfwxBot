@@ -1,0 +1,273 @@
+{
+  "story_template": {
+    "elements": {
+      "date": {"x": 540, "y": 120, "font_name": "Inter_18pt-Regular", "font_size": 40, "color": "#FFFFFFE6", "align": "center"},
+      "catch_phrase": {"x": 540, "y": 250, "font_name": "Inter_24pt-SemiBold", "font_size": 60, "color": "#FFFFFFFF", "align": "center", "max_width": 900},
+      "temp_max": {"x": 380, "y": 450, "font_name": "Satoshi-Bold", "font_size": 120, "color": "#FFFFFFFF", "align": "center"},
+      "temp_min": {"x": 700, "y": 450, "font_name": "Satoshi-Bold", "font_size": 120, "color": "#DCDCDCFF", "align": "center"},
+      "temp_diff": {"x": 540, "y": 600, "font_name": "Inter_18pt-Regular", "font_size": 36, "color": "#FFFFFFC8", "align": "center"},
+      "rain_info": {"x": 100, "y": 750, "font_name": "Inter_18pt-Regular", "font_size": 36, "color": "#ADD8E6FF", "align": "left", "line_spacing": 15, "max_width": 880},
+      "humidity_wind": {"x": 540, "y": 950, "font_name": "Inter_18pt-Regular", "font_size": 36, "color": "#FFFFFFC8", "align": "center"},
+      "uv_air": {"x": 540, "y": 1020, "font_name": "Inter_18pt-Regular", "font_size": 36, "color": "#FFFFFFC8", "align": "center"},
+      "hourly_temps": {
+        "y_title": 1200,
+        "y_temp": 1280,
+        "font_name": "Inter_18pt-Regular",
+        "font_size_title": 32,
+        "font_size_temp": 48,
+        "color": "#FFFFFFE6",
+        "slots": [
+          {"label": "Morning", "x": 270},
+          {"label": "Lunch", "x": 450},
+          {"label": "Evening", "x": 630},
+          {"label": "Night", "x": 810}
+        ]
+      },
+      "sun_info": {"x": 540, "y": 1500, "font_name": "Inter_18pt-Regular", "font_size": 32, "color": "#FFFFFFC8", "align": "center"},
+      "moon_info": {"x": 540, "y": 1600, "font_name": "Inter_18pt-Regular", "font_size": 32, "color": "#FFFFFFC8", "align": "center"}
+    }
+  },
+  "post_template": {
+    "size": [1080, 1350],
+    "font_color_light_bg": "#000000",
+    "font_color_dark_bg": "#FFFFFF", 
+    "background_color": "#FFFFFF",
+    "elements": {
+      "date": {
+        "x": 483, 
+        "y": 320, 
+        "font_name": "Inter_18pt-Regular",
+        "font_name_ko": "NanumSquareNeo-bRg", 
+        "font_size": 23, 
+        "color": "#b4b4b4", 
+        "align": "left"
+      },
+      "date_for_warning": {
+        "x": 483, 
+        "y": 320, 
+        "font_name": "Inter_18pt-Regular",
+        "font_name_ko": "NanumSquareNeo-bRg", 
+        "font_size": 25, 
+        "color": "#a5aab2", 
+        "align": "left"
+      },
+      "catch_phrase": {
+        "x": 778, 
+        "y": 397, 
+        "font_name": "Inter_18pt-Regular",
+        "font_name_ko": "NanumSquareNeo-bRg", 
+        "font_size": 24, 
+        "color": "#000000", 
+        "align": "center", 
+        "max_width": 1000
+      },
+      "warning_info": {
+        "x": 483, 
+        "y": 359, 
+        "font_name": "Inter_24pt-ExtraBold",
+        "font_name_ko": "NanumSquareNeo-dEb", 
+        "font_size": 28, 
+        "color": "#000000", 
+        "align": "left"
+      },
+      "temp_max": {
+        "x": 91, 
+        "y": 616, 
+        "font_name": "Satoshi-Bold", 
+        "font_size": 90, 
+        "color": "#FFFFFF", 
+        "align": "left"
+      },
+      "temp_min": {
+        "x": 330, 
+        "y": 641, 
+        "font_name": "Satoshi-Bold", 
+        "font_size": 60, 
+        "color": "#FFFFFF", 
+        "align": "left"
+      },
+      "temp_diff": {
+        "x": 480, 
+        "y": 670, 
+        "font_name": "Inter_18pt-Regular",
+        "font_name_ko": "NanumSquareNeo-bRg", 
+        "font_size": 23, 
+        "color": "#FFFFFF", 
+        "align": "left"
+      },
+      "rain_info": {
+        "x": 71, 
+        "y": 568, 
+        "font_name": "Inter_18pt-Regular",
+        "font_name_ko": "NanumSquareNeo-bRg", 
+        "font_size": 23, 
+        "color": "#FFFFFF", 
+        "align": "left", 
+        "max_width": 1000
+      },
+      "rain_probability": {
+        "x": 208, 
+        "y": 912, 
+        "font_name": "Inter_24pt-SemiBold", 
+        "font_size": 37, 
+        "color": "#000000", 
+        "align": "center"
+      },
+      "rain_amount": {
+        "x": 207,
+        "y": 973,
+        "font_name": "Inter_24pt-SemiBold",
+        "font_size": 16,
+        "color": "#000000",
+        "align": "center"
+      },
+      "humidity": {
+        "x": 426, 
+        "y": 912, 
+        "font_name": "Inter_24pt-SemiBold", 
+        "font_size": 37, 
+        "color": "#000000", 
+        "align": "center"
+      },
+      "wind": {
+        "x": 652, 
+        "y": 912, 
+        "font_name": "Inter_24pt-SemiBold", 
+        "font_size": 37, 
+        "color": "#000000", 
+        "align": "center"
+      },
+      "uv_number": {
+        "x": 866, 
+        "y": 912, 
+        "font_name": "Inter_24pt-SemiBold", 
+        "font_size": 37, 
+        "color": "#000000", 
+        "align": "center"
+      },
+      "uv_level": {
+        "x": 866, 
+        "y": 960, 
+        "font_name": "Inter_18pt-Regular",
+        "font_name_ko": "NanumSquareNeo-bRg", 
+        "font_size": 16, 
+        "color": "#000000", 
+        "align": "center"
+      },
+      "air_quality_status": {
+        "x": 260, 
+        "y": 1104, 
+        "font_name": "Inter_24pt-SemiBold", 
+        "font_size": 30, 
+        "color": "#000000", 
+        "align": "center"
+      },   
+      "air_quality_pm10": {
+        "x": 200, 
+        "y": 1072, 
+        "font_name": "Inter_18pt-Regular",
+        "font_name_ko": "NanumSquareNeo-bRg", 
+        "font_size": 18, 
+        "color": "#333333", 
+        "align": "left",
+        "visible": true
+      },
+      "air_quality_pm25": {
+        "x": 200, 
+        "y": 1113, 
+        "font_name": "Inter_18pt-Regular",
+        "font_name_ko": "NanumSquareNeo-bRg", 
+        "font_size": 18, 
+        "color": "#333333", 
+        "align": "left",
+        "visible": true
+      },
+      "daylight": {
+        "x": 549, 
+        "y": 1085, 
+        "font_name": "Inter_18pt-Regular",
+        "font_name_ko": "NanumSquareNeo-bRg", 
+        "font_size": 24, 
+        "color": "#000000", 
+        "align": "left"
+      },
+      "night": {
+        "x": 549, 
+        "y": 1191, 
+        "font_name": "Inter_18pt-Regular",
+        "font_name_ko": "NanumSquareNeo-bRg", 
+        "font_size": 24, 
+        "color": "#000000", 
+        "align": "left"
+      },
+      "sunrise": {
+        "x": 822, 
+        "y": 1072, 
+        "font_name": "Inter_18pt-Regular", 
+        "font_size": 21, 
+        "color": "#000000", 
+        "align": "left"
+      },
+      "sunset": {
+        "x": 822, 
+        "y": 1113, 
+        "font_name": "Inter_18pt-Regular", 
+        "font_size": 21, 
+        "color": "#000000", 
+        "align": "left"
+      },
+      "moonrise": {
+        "x": 822, 
+        "y": 1173, 
+        "font_name": "Inter_18pt-Regular", 
+        "font_size": 21, 
+        "color": "#000000", 
+        "align": "left"
+      },
+      "moonset": {
+        "x": 822, 
+        "y": 1214, 
+        "font_name": "Inter_18pt-Regular", 
+        "font_size": 21, 
+        "color": "#000000", 
+        "align": "left"
+      },
+      "moon_emoji": {
+        "x": 973, 
+        "y": 1175, 
+        "font_name": "NotoColorEmoji-Regular", 
+        "font_size": 43, 
+        "color": "#000000", 
+        "align": "center"
+      },
+      "moon_phase": {
+        "x": 965, 
+        "y": 1220, 
+        "font_name": "Inter_18pt-Regular",
+        "font_name_ko": "NanumSquareNeo-bRg", 
+        "font_size": 14, 
+        "color": "#000000", 
+        "align": "center",
+        "max_width": 30
+      },
+      "activity_index_am": {
+        "x": 227,
+        "y": 1192,
+        "font_name": "Inter_18pt-Regular",
+        "font_name_ko": "NanumSquareNeo-bRg",
+        "font_size": 19,
+        "color": "#000000",
+        "align": "left"
+      },
+      "activity_index_pm": {
+        "x": 227,
+        "y": 1222,
+        "font_name": "Inter_18pt-Regular",
+        "font_name_ko": "NanumSquareNeo-bRg",
+        "font_size": 19,
+        "color": "#000000",
+        "align": "left"
+      }
+    }
+  }
+}
