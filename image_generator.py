@@ -5,6 +5,7 @@ import datetime
 import json
 import os
 from pathlib import Path
+from zoneinfo import ZoneInfo # 시간대 정보 라이브러리
 from PIL import Image, ImageDraw, ImageFont
 from pilmoji import Pilmoji
 
