@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # MyFirstGeminiApp: 날씨 정보 기반 이미지 생성 및 공유 애플리케이션
 
 ## 프로젝트 개요
@@ -85,3 +86,7 @@ python main.py
 
 ## 개발자 정보
 @scrathy
+=======
+# tjdnfwxBot
+Automated weather forecast posting bot for Instagram using GitHub Actions
+>>>>>>> 6eaa40bfdfcd60d536dc9df85abf12525a5e8101

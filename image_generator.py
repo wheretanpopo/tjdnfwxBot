@@ -14,7 +14,10 @@ class ImageGenerator:
     """
     
     def __init__(self, base_dir_name="weather_service"):
-        self.base_dir = Path("D:/Documents/Gemini_Projects/MyFirstGeminiApp") / base_dir_name
+        # 이 파일(image_generator.py)의 위치를 기준으로 프로젝트 루트 폴더를 찾습니다.
+        # 이렇게 하면 어떤 위치에서 스크립트를 실행해도 항상 정확한 경로를 찾을 수 있습니다.
+        script_dir = Path(__file__).parent
+        self.base_dir = script_dir / base_dir_name
         self.templates_dir = self.base_dir / "templates"
         self.fonts_dir = self.base_dir / "fonts"
         self.config_dir = self.base_dir / "config"
