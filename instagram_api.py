@@ -244,7 +244,7 @@ class InstagramAPI:
             "모든 날씨 정보는 매일 새벽 5시 30분 기준으로 생성됩니다.",
             "특히, 기상특보(폭염, 호우 등)는 이 시각에 발효 중인 내용을 반영하므로, 이후에 발표되거나 해제되는 특보와는 차이가 있을 수 있습니다.",
             "",
-            ""All weather information is generated daily at 5:30 AM.",
+            "All weather information is generated daily at 5:30 AM.",
             "In particular, weather advisories/warnings (such as heat waves or heavy rain) reflect the status as of that time. Please note that any advisories issued or lifted after this time may not be reflected.",
             "",
             "#WeatherForecast #Seoul #DailyWeather",
