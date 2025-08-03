@@ -226,7 +226,9 @@ class InstagramAPI:
                 print(f"    - 응답 내용: {e.response.text}")
             return None
 
-    '''    def _generate_dynamic_weather_summary(self, weather_data, warnings, language='ko'):
+        return None
+
+    def _generate_dynamic_weather_summary(self, weather_data, warnings, language='ko'):
         """날씨 데이터를 기반으로 동적 요약 문장을 생성합니다."""
         if not weather_data:
             return "날씨 정보를 요약할 수 없습니다." if language == 'ko' else "Could not summarize weather information."
@@ -298,9 +300,8 @@ class InstagramAPI:
             "#WeatherUpdate #KoreaWeather #Weather"
         ]
         
-        return "
-".join(caption_parts)
-''
+        return "".join(caption_parts)
+
 
 
 def post_daily_weather(instagram_api, generated_images, lang_data):
