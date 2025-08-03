@@ -75,7 +75,7 @@ def process_weather_data(weather_api_data, target_date):
                         else:
                             amount = float(value)
                     except (ValueError, IndexError) as e:
-                        print(f"⚠️ 강수량 파싱 오류 - 원본 값: '{item["fcstValue"]}', 처리된 값: '{value}', 오류: {e}")
+                        print(f"⚠️ 강수량 파싱 오류 - 원본 값: '{item['fcstValue']}', 처리된 값: '{value}', 오류: {e}")
                         continue
                 
                 processed["rain_amount"][fcst_time] = amount
