@@ -209,7 +209,8 @@ class ImageGenerator:
                     current_line = [word]
             if current_line:
                 lines.append(' '.join(current_line))
-            text_to_draw = "\n".join(lines)
+            text_to_draw = "
+".join(lines)
 
         # 정렬 처리
         if align == "center":
@@ -403,7 +404,7 @@ class ImageGenerator:
         air_pm10_text = f"PM10: {pm10_status} {air_pm10.get('emoji', '⚪')}"
         air_pm25_text = f"PM2.5: {pm25_status} {air_pm25.get('emoji', '⚪')}"
 
-        """        # 강수량 텍스트 (값이 0.1 미만일 경우 특별 처리)
+        # 강수량 텍스트 (값이 0.1 미만일 경우 특별 처리)
         rain_amount_value = ws.get('total_rain_amount', 0)
         if rain_amount_value < 0.1:
             rain_amount_text = "1mm 미만" if language == 'ko' else "Less than 1mm"
@@ -415,7 +416,7 @@ class ImageGenerator:
 
         # 천체 정보
         sunrise_text = self._format_time_hhmm_to_readable(astro.get('sunrise', 'N/A'))
-        sunset_text = self._format_time_hhmm_to_readable(astro.get('sunset', 'N/A'))""
+        sunset_text = self._format_time_hhmm_to_readable(astro.get('sunset', 'N/A'))
         daylight_text = self._format_duration_to_hm(astro.get('daylight_duration', 'N/A'), language)
         night_text = self._format_duration_to_hm(astro.get('night_duration', 'N/A'), language)
         moonrise_text = self._format_time_hhmm_to_readable(astro.get('moonrise', 'N/A'))
@@ -504,10 +505,6 @@ class ImageGenerator:
             ("temp_diff", temp_diff_text),
             ("rain_probability", rain_probability_text),
             ("rain_amount", rain_amount_text),
-            ("humidity", humidity_text),
-            ("wind", wind_text),
-            ("uv_number", uv_number_text),
-            ("uv_level", uv_level_text),
             ("humidity", humidity_text),
             ("wind", wind_text),
             ("uv_number", uv_number_text),
