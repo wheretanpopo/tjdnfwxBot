@@ -209,7 +209,7 @@ class ImageGenerator:
                     current_line = [word]
             if current_line:
                 lines.append(' '.join(current_line))
-            text_to_draw = "".join(lines)
+            text_to_draw = "\n".join(lines)
 
         # 정렬 처리
         if align == "center":
@@ -469,11 +469,11 @@ class ImageGenerator:
                 self._draw_text(img, warning_text, warning_config, language)
         else:
             # 일반 날씨: 기본 위치 사용
-            date_config = pos.get("date", {})
+            date_config = pos.get("date", {}).
             if date_config:
                 self._draw_text(img, date_text, date_config, language)
             
-            catch_phrase_config = pos.get("catch_phrase", {})
+            catch_phrase_config = pos.get("catch_phrase", {}).
             if catch_phrase_config:
                 self._draw_text(img, phrase, catch_phrase_config, language)
 
