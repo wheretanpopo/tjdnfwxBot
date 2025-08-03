@@ -37,6 +37,7 @@ def get_astronomical_info(api_key, location, target_date):
         response.raise_for_status()
         if response.status_code == 200 and response.text.strip():
             print("일출/일몰 API 호출 성공")
+            print(f"[DEBUG] KASI 일출/일몰 API 응답: {response.text}")
             return response.text
     except requests.exceptions.RequestException as e:
         print(f"❌ 일출/일몰 API 오류: {e}")

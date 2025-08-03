@@ -103,7 +103,8 @@
         "font_size": 21, 
         "color": "#FFFFFF", 
         "align": "left", 
-        "max_width": 600
+        "max_width": 600,
+        "line_spacing": 25
       },
       "rain_probability": {
         "x": 208, 

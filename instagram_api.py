@@ -226,25 +226,71 @@ class InstagramAPI:
                 print(f"    - 응답 내용: {e.response.text}")
             return None
 
+    '''    def _generate_dynamic_weather_summary(self, weather_data, warnings, language='ko'):
+        """날씨 데이터를 기반으로 동적 요약 문장을 생성합니다."""
+        if not weather_data:
+            return "날씨 정보를 요약할 수 없습니다." if language == 'ko' else "Could not summarize weather information."
+
+        # 데이터 추출
+        description = weather_data.get('description', '알 수 없음')
+        rain_prob_max = weather_data.get('rain_prob_max', 0)
+        
+        # 언어별 설정
+        if language == 'ko':
+            # 1. 기본 하늘 상태
+            # '맑아요, 더워요' -> '대체로 맑고 더운'
+            desc_ko = description.replace('요', '고').replace('맑고', '맑고,').replace('흐리고', '흐리고,')
+            summary = f"오늘 서울은 대체로 {desc_ko} 날씨가 예상됩니다."
+
+            # 2. 특보 정보
+            if warnings and warnings.get('type'):
+                summary += f" 현재 {warnings['type']} {warnings['level']}가 발효 중입니다."
+
+            # 3. 강수 정보
+            if rain_prob_max >= 30:
+                summary += f" 비 올 확률은 약 {rain_prob_max}%입니다."
+            
+            return summary
+        else: # English
+            # 1. Base sky status
+            summary = f"Today in Seoul, the weather will be mostly {description}."
+
+            # 2. Warning info
+            if warnings and warnings.get('type'):
+                level_en = 'Advisory' if warnings.get('level') == '주의보' else 'Warning'
+                type_en_map = {'폭염': 'Heatwave', '호우': 'Heavy Rain', '태풍': 'Typhoon'}
+                type_en = type_en_map.get(warnings['type'], 'Weather')
+                summary += f" A {type_en} {level_en} is currently in effect."
+
+            # 3. Rain info
+            if rain_prob_max >= 30:
+                summary += f" There is a {rain_prob_max}% chance of rain."
+                
+            return summary
+
     def create_caption_for_carousel(self, lang_data, primary_lang='ko'):
         """
-        캐러셀용 캡션을 생성합니다.
+        캐러셀용 캡션을 생성합니다. (동적 요약 기능 추가)
         """
-        # 주 언어의 캐치프레이즈를 메인으로 사용
-        main_phrase = lang_data.get(primary_lang, {}).get('catch_phrase', 'Great weather today!')
+        # 주 언어의 날씨 데이터로 동적 요약 생성
+        weather_summary_data = lang_data.get(primary_lang, {}).get('weather_summary', {})
+        warnings_data = lang_data.get(primary_lang, {}).get('warnings')
+        
+        dynamic_summary = self._generate_dynamic_weather_summary(weather_summary_data, warnings_data, primary_lang)
+        
         date_str = datetime.datetime.now(ZoneInfo("Asia/Seoul")).strftime('%B %d, %Y')
         
         # 기본 캡션 구성
         caption_parts = [
             f"📅 {date_str}",
-            f"✨ {main_phrase}",
+            f"✨ {dynamic_summary}",
             "",
             "by Seoul Weather Forecast",
             "",
             "모든 날씨 정보는 매일 새벽 5시 30분 기준으로 생성됩니다.",
             "특히, 기상특보(폭염, 호우 등)는 이 시각에 발효 중인 내용을 반영하므로, 이후에 발표되거나 해제되는 특보와는 차이가 있을 수 있습니다.",
             "",
-            ""All weather information is generated daily at 5:30 AM.",
+            "All weather information is generated daily at 5:30 AM.",
             "In particular, weather advisories/warnings (such as heat waves or heavy rain) reflect the status as of that time. Please note that any advisories issued or lifted after this time may not be reflected.",
             "",
             "#WeatherForecast #Seoul #DailyWeather",
@@ -252,7 +298,9 @@ class InstagramAPI:
             "#WeatherUpdate #KoreaWeather #Weather"
         ]
         
-        return "\n".join(caption_parts)
+        return "
+".join(caption_parts)
+''
 
 
 def post_daily_weather(instagram_api, generated_images, lang_data):

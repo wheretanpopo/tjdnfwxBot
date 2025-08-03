@@ -403,31 +403,19 @@ class ImageGenerator:
         air_pm10_text = f"PM10: {pm10_status} {air_pm10.get('emoji', '⚪')}"
         air_pm25_text = f"PM2.5: {pm25_status} {air_pm25.get('emoji', '⚪')}"
 
+        """        # 강수량 텍스트 (값이 0.1 미만일 경우 특별 처리)
+        rain_amount_value = ws.get('total_rain_amount', 0)
+        if rain_amount_value < 0.1:
+            rain_amount_text = "1mm 미만" if language == 'ko' else "Less than 1mm"
+        else:
+            rain_amount_text = f"{rain_amount_value:.1f}mm"
+
         # 강수 정보 (이미 언어별로 처리됨)
         rain_details = ws.get('detailed_rain_times', [])
-        if isinstance(rain_details, list) and rain_details:
-            rain_text = "\n".join(rain_details)
-        else:
-            # 강수 확률로 대체
-            rain_prob_max = ws.get('rain_prob_max', 0)
-            if language == 'ko':
-                if rain_prob_max > 70:
-                    rain_text = "비 올 가능성 높음"
-                elif rain_prob_max > 30:
-                    rain_text = "비 올 수도"
-                else:
-                    rain_text = "비 안 올 것 같음"
-            else:
-                if rain_prob_max > 70:
-                    rain_text = "Rain likely"
-                elif rain_prob_max > 30:
-                    rain_text = "Possible rain"
-                else:
-                    rain_text = "No rain expected"
 
         # 천체 정보
         sunrise_text = self._format_time_hhmm_to_readable(astro.get('sunrise', 'N/A'))
-        sunset_text = self._format_time_hhmm_to_readable(astro.get('sunset', 'N/A'))
+        sunset_text = self._format_time_hhmm_to_readable(astro.get('sunset', 'N/A'))""
         daylight_text = self._format_duration_to_hm(astro.get('daylight_duration', 'N/A'), language)
         night_text = self._format_duration_to_hm(astro.get('night_duration', 'N/A'), language)
         moonrise_text = self._format_time_hhmm_to_readable(astro.get('moonrise', 'N/A'))
@@ -493,12 +481,33 @@ class ImageGenerator:
         # 나머지 모든 텍스트 그리기 (language 파라미터 추가)
         # ========================================
         
+        # rain_info는 여러 줄일 수 있으므로 별도 처리
+        if 'rain_info' in pos and rain_details:
+            rain_config = pos['rain_info']
+            start_y = rain_config.get('y', 0)
+            # positions.json에 정의된 line_spacing 사용, 없으면 폰트 크기 + 4
+            line_spacing = rain_config.get('line_spacing', rain_config.get('font_size', 20) + 4)
+            
+            for i, line in enumerate(rain_details):
+                line_y = start_y + (i * line_spacing)
+                line_config = rain_config.copy()
+                line_config['y'] = line_y
+                
+                try:
+                    self._draw_text(img, line, line_config, language)
+                except Exception as e:
+                    print(f"⚠️ rain_info의 {i+1}번째 줄 그리기 실패: {e}")
+
         text_elements = [
             ("temp_max", temp_max_text),
             ("temp_min", temp_min_text),
             ("temp_diff", temp_diff_text),
-            ("rain_info", rain_text),
             ("rain_probability", rain_probability_text),
+            ("rain_amount", rain_amount_text),
+            ("humidity", humidity_text),
+            ("wind", wind_text),
+            ("uv_number", uv_number_text),
+            ("uv_level", uv_level_text),
             ("humidity", humidity_text),
             ("wind", wind_text),
             ("uv_number", uv_number_text),

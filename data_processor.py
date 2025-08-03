@@ -32,6 +32,7 @@ def process_weather_data(weather_api_data, target_date):
         "humidity": [],
         "wind_speeds": [],
         "rain_prob": {},
+        "rain_amount": {},
         "rain_amounts_list": [],
         "rain_type": {},
         "sky_status": {},
@@ -55,23 +56,31 @@ def process_weather_data(weather_api_data, target_date):
             elif category == "POP":
                 processed["rain_prob"][fcst_time] = int(value)
             elif category == "PCP":
+                # "강수없음"은 일반적으로 0mm를 의미하므로, 강수확률이 있을 경우를 대비해 0으로 처리
                 if "강수없음" in value or "없음" in value:
-                    continue
-                try:
-                    import re
-                    numbers = re.findall(r'\d+\.?\d*', value)
-                    if len(numbers) == 1:
-                        amount = float(numbers[0])
-                    elif len(numbers) == 2:
-                        amount = (float(numbers[0]) + float(numbers[1])) / 2
-                    elif "미만" in value:
-                        amount = 0.5
-                    else:
+                    amount = 0.0
+                else:
+                    # "mm" 단위 제거 및 공백 제거
+                    value = value.replace("mm", "").strip()
+                    try:
+                        # "1.0 미만" 과 같은 형태 처리
+                        if "미만" in value:
+                            num_part = value.split(' ')[0]
+                            amount = float(num_part) / 2 # 예: 1.0 미만 -> 0.5
+                        # "5.0~10.0" 과 같은 범위 형태 처리
+                        elif '~' in value:
+                            parts = value.split('~')
+                            amount = (float(parts[0]) + float(parts[1])) / 2
+                        # 단일 숫자 값 처리
+                        else:
+                            amount = float(value)
+                    except (ValueError, IndexError) as e:
+                        print(f"⚠️ 강수량 파싱 오류 - 원본 값: '{item["fcstValue"]}', 처리된 값: '{value}', 오류: {e}")
                         continue
-                    processed["rain_amounts_list"].append(amount)
-                except (ValueError, IndexError):
-                    print(f"⚠️ 강수량 파싱 오류 - 값: {value}")
-                    continue
+                
+                processed["rain_amount"][fcst_time] = amount
+                processed["rain_amounts_list"].append(amount)
+
             elif category == "PTY":
                 processed["rain_type"][fcst_time] = int(value)
             elif category == "REH":
