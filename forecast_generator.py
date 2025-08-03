@@ -51,42 +51,32 @@ def classify_wind_strength(wind_speed):
 
 def classify_main_weather(sky_status, rain_type, rain_prob_max, temp_max, rainfall_max=0, warnings=None):
     """
-    전체적인 날씨 상태를 분류합니다. 특보를 최우선으로 고려합니다.
+    전체적인 날씨 상태를 분류합니다. 특보를 최우선으로 고려하되, 다른 날씨 정보도 함께 반환합니다.
     """
     print(f"[DEBUG] classify_main_weather received warnings: {warnings}")
     
+    special_weather = None
+    special_description = None
+
     # 1. 기상청 공식 특보 우선 판단
     if warnings and isinstance(warnings, dict):
-        # warn_type을 문자열로 강제 변환하고, 공백 및 특수문자 제거하여 정확한 비교를 보장
         warn_type = str(warnings.get('type', '')).strip().replace('\r', '').replace('\n', '')
-        print(f"[DEBUG] Processed warn_type: '{warn_type}'") # 처리된 warn_type 확인
+        print(f"[DEBUG] Processed warn_type: '{warn_type}'")
 
         if warn_type == '폭염':
-            print("[DEBUG] '폭염' 특보 조건 일치! HEATWAVE 반환.") # 조건 일치 확인
-            return {
-                "weather": "HEATWAVE", 
-                "temperature": "EXTREME",
-                "combined": "HEATWAVE",
-                "description": f"폭염 {warnings.get('level', '')} 발효 중"
-            }
-        if warn_type == '호우':
-            print("[DEBUG] '호우' 특보 조건 일치! HEAVY_RAIN 반환.")
-            return {
-                "weather": "HEAVY_RAIN",
-                "temperature": "NORMAL", 
-                "combined": "HEAVY_RAIN",
-                "description": f"호우 {warnings.get('level', '')} 발효 중"
-            }
-        if warn_type == '태풍':
-            print("[DEBUG] '태풍' 특보 조건 일치! TYPHOON 반환.")
-            return {
-                "weather": "TYPHOON",
-                "temperature": "EXTREME", 
-                "combined": "TYPHOON",
-                "description": f"태풍 {warnings.get('level', '')} 발효 중"
-            }
+            print("[DEBUG] '폭염' 특보 조건 일치! HEATWAVE 설정.")
+            special_weather = "HEATWAVE"
+            special_description = f"폭염 {warnings.get('level', '')} 발효 중"
+        elif warn_type == '호우':
+            print("[DEBUG] '호우' 특보 조건 일치! HEAVY_RAIN 설정.")
+            special_weather = "HEAVY_RAIN"
+            special_description = f"호우 {warnings.get('level', '')} 발효 중"
+        elif warn_type == '태풍':
+            print("[DEBUG] '태풍' 특보 조건 일치! TYPHOON 설정.")
+            special_weather = "TYPHOON"
+            special_description = f"태풍 {warnings.get('level', '')} 발효 중"
 
-    # --- 특보가 없을 경우, 아래의 일반 날씨 판단 로직 수행 ---
+    # --- 항상 일반 날씨 판단 로직을 수행 ---
     base_weather = None
     temp_state = "NORMAL"
     
@@ -119,31 +109,31 @@ def classify_main_weather(sky_status, rain_type, rain_prob_max, temp_max, rainfa
         elif temp_max <= 10:
             temp_state = "COLD"
     
-    # 5. 조합 결과 생성
-    weather_descriptions = {
-        "SUNNY": "맑아요", "PARTLY_CLOUDY": "구름 조금", "CLOUDY": "흐려요",
-        "RAINY": "비가 와요", "SHOWER": "소나기가 와요", "SNOW": "눈이 와요"
-    }
-    temp_descriptions = {
-        "VERY_HOT": "매우 더워요", "HOT": "더워요", "NORMAL": "",
-        "COLD": "추워요", "VERY_COLD": "매우 추워요"
-    }
-    
-    base_desc = weather_descriptions.get(base_weather, "알 수 없음")
-    temp_desc = temp_descriptions.get(temp_state, "")
-    
-    if temp_state == "NORMAL":
-        combined = base_weather
-        description = base_desc
+    # 5. 최종 결과 조합
+    # 특보가 있으면 특보를 최종 날씨 상태로 사용
+    if special_weather:
+        final_weather = special_weather
+        final_description = special_description
+        # 온도는 특보에 따라 조정 (예: 폭염 시 EXTREME)
+        if final_weather == "HEATWAVE" or final_weather == "TYPHOON":
+            temp_state = "EXTREME"
+        else:
+            temp_state = "NORMAL"
+        combined = final_weather # 특보가 있으면 combined는 특보 상태를 따름
     else:
-        combined = f"{base_weather}_{temp_state}"
-        description = f"{base_desc}, {temp_desc}" if temp_desc else base_desc
-    
+        final_weather = base_weather
+        final_description = base_desc
+        if temp_state != "NORMAL":
+            combined = f"{base_weather}_{temp_state}"
+            final_description = f"{base_desc}, {temp_desc}" if temp_desc else base_desc
+        else:
+            combined = base_weather
+
     return {
-        "weather": base_weather,
+        "weather": final_weather,
         "temperature": temp_state,
         "combined": combined,
-        "description": description
+        "description": final_description
     }
 
 def analyze_processed_data(processed_data, target_date, yesterday_temps=None, warnings=None, language='en'):

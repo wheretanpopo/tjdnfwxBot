@@ -96,14 +96,14 @@
         "align": "left"
       },
       "rain_info": {
-        "x": 71, 
+        "x": 65, 
         "y": 568, 
         "font_name": "Inter_18pt-Regular",
         "font_name_ko": "NanumSquareNeo-bRg", 
-        "font_size": 23, 
+        "font_size": 21, 
         "color": "#FFFFFF", 
         "align": "left", 
-        "max_width": 1000
+        "max_width": 600
       },
       "rain_probability": {
         "x": 208, 
