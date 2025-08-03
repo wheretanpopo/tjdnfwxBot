@@ -209,8 +209,7 @@ class ImageGenerator:
                     current_line = [word]
             if current_line:
                 lines.append(' '.join(current_line))
-            text_to_draw = "
-".join(lines)
+            text_to_draw = "".join(lines)
 
         # 정렬 처리
         if align == "center":
