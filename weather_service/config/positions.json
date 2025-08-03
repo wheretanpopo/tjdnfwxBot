@@ -96,7 +96,7 @@
         "align": "left"
       },
       "rain_info": {
-        "x": 65, 
+        "x": 50, 
         "y": 568, 
         "font_name": "Inter_18pt-Regular",
         "font_name_ko": "NanumSquareNeo-bRg", 
@@ -116,7 +116,7 @@
       },
       "rain_amount": {
         "x": 207,
-        "y": 973,
+        "y": 960,
         "font_name": "Inter_24pt-SemiBold",
         "font_size": 16,
         "color": "#000000",
