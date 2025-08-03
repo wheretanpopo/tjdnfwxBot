@@ -362,8 +362,8 @@ def analyze_rain_times_detailed(prob, amount, p_type, pty_map, language='en'):
     
     if language == 'ko':
         pty_map = {0: "강수 없음", 1: "비", 2: "비/눈", 3: "눈", 4: "소나기"}
-        high_chance_label = "강수 예상 시간(50%↑):"
-        possible_label = "강수 가능 시간(30%↑):"
+        high_chance_label = "강수 예상(50%↑):"
+        possible_label = "강수 가능(30%↑):"
     else:
         high_chance_label = "HIGH CHANCE OF RAIN:"
         possible_label = "POSSIBLE RAIN:"
