@@ -117,7 +117,7 @@
       "rain_amount": {
         "x": 207,
         "y": 960,
-        "font_name": "Inter_24pt-SemiBold",
+        "font_name": "Inter_18pt-Regular",
         "font_size": 16,
         "color": "#000000",
         "align": "center"
