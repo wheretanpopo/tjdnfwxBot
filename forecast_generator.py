@@ -110,22 +110,34 @@ def classify_main_weather(sky_status, rain_type, rain_prob_max, temp_max, rainfa
             temp_state = "COLD"
     
     # 5. 최종 결과 조합
+    # 기본 날씨 설명 생성
+    base_desc_map = {
+        "SUNNY": "맑음", "PARTLY_CLOUDY": "구름 조금", "CLOUDY": "흐림",
+        "RAINY": "비", "SNOW": "눈", "SHOWER": "소나기"
+    }
+    temp_desc_map = {
+        "VERY_HOT": "매우 더움", "HOT": "더움", "COLD": "쌀쌀함", "VERY_COLD": "매우 추움"
+    }
+    
+    base_description = base_desc_map.get(base_weather, "")
+    if temp_state != "NORMAL":
+        temp_description = temp_desc_map.get(temp_state, "")
+        base_description = f"{base_description}, {temp_description}" if base_description else temp_description
+
     # 특보가 있으면 특보를 최종 날씨 상태로 사용
     if special_weather:
         final_weather = special_weather
         final_description = special_description
-        # 온도는 특보에 따라 조정 (예: 폭염 시 EXTREME)
-        if final_weather == "HEATWAVE" or final_weather == "TYPHOON":
+        if final_weather in ["HEATWAVE", "TYPHOON"]:
             temp_state = "EXTREME"
         else:
             temp_state = "NORMAL"
-        combined = final_weather # 특보가 있으면 combined는 특보 상태를 따름
+        combined = final_weather
     else:
         final_weather = base_weather
-        final_description = base_desc
+        final_description = base_description
         if temp_state != "NORMAL":
             combined = f"{base_weather}_{temp_state}"
-            final_description = f"{base_desc}, {temp_desc}" if temp_desc else base_desc
         else:
             combined = base_weather
 
@@ -133,7 +145,8 @@ def classify_main_weather(sky_status, rain_type, rain_prob_max, temp_max, rainfa
         "weather": final_weather,
         "temperature": temp_state,
         "combined": combined,
-        "description": final_description
+        "description": final_description,
+        "base_description": base_description # 기본 날씨 설명 추가
     }
 
 def analyze_processed_data(processed_data, target_date, yesterday_temps=None, warnings=None, language='en'):
