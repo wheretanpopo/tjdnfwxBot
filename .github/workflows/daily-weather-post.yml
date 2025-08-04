@@ -5,6 +5,9 @@ on:
   schedule:
     - cron: '30 20 * * *'  # KST 05:30 (UTC 20:30)
   workflow_dispatch:
+  
+permissions:
+  contents: write
 
 jobs:
   build-and-post:
