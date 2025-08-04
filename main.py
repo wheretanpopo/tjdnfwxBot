@@ -4,6 +4,7 @@
 
 import datetime
 import json
+import subprocess # git 명령 실행을 위해 추가
 from pathlib import Path
 from zoneinfo import ZoneInfo # 시간대 정보 라이브러리
 
@@ -256,6 +257,34 @@ def main():
     }
     if today_temps_to_save['yesterday_max_temp'] is not None:
         save_today_temps(today_temps_to_save)
+        
+        # --- Git에 변경사항 커밋 및 푸시 ---
+        print("\n8. 변경된 기온 데이터 Git에 저장 중...")
+        try:
+            # 1. Git 사용자 설정
+            subprocess.run(['git', 'config', '--global', 'user.name', 'github-actions[bot]'], check=True)
+            subprocess.run(['git', 'config', '--global', 'user.email', 'github-actions[bot]@users.noreply.github.com'], check=True)
+            
+            # 2. 파일 스테이징
+            subprocess.run(['git', 'add', str(LAST_DAY_DATA_FILE)], check=True)
+            
+            # 3. 변경사항 확인 및 커밋
+            status_result = subprocess.run(['git', 'status', '--porcelain'], capture_output=True, text=True)
+            if str(LAST_DAY_DATA_FILE) in status_result.stdout:
+                commit_message = f"[BOT] Update temperature data for {target_date}"
+                subprocess.run(['git', 'commit', '-m', commit_message], check=True)
+                print(f" -> 커밋 생성: {commit_message}")
+                
+                # 4. 푸시
+                subprocess.run(['git', 'push'], check=True)
+                print(" -> Git 저장소에 성공적으로 푸시했습니다.")
+            else:
+                print(" -> 변경사항이 없어 커밋을 건너뜠니다.")
+
+        except subprocess.CalledProcessError as e:
+            print(f"❌ Git 작업 실패: {e}")
+        except Exception as e:
+            print(f"❌ 예상치 못한 오류 발생: {e}")
     
     print("\n" + "="*50)
     print("Weather Service Completed Successfully! 🎉")
