@@ -255,8 +255,10 @@ def main():
         'yesterday_max_temp': temp_max_for_save,
         'yesterday_min_temp': temp_min_for_save
     }
+    print(f"[DEBUG] today_temps_to_save: {today_temps_to_save}")
     if today_temps_to_save['yesterday_max_temp'] is not None:
         save_today_temps(today_temps_to_save)
+        print(f"[DEBUG] last_day_data.json content after save: {load_yesterday_temps()}")
         
         # --- Git에 변경사항 커밋 및 푸시 ---
         print("\n8. 변경된 기온 데이터 Git에 저장 중...")
@@ -270,6 +272,7 @@ def main():
             
             # 3. 변경사항 확인 및 커밋
             status_result = subprocess.run(['git', 'status', '--porcelain'], capture_output=True, text=True)
+            print(f"[DEBUG] git status --porcelain output: {status_result.stdout}")
             if str(LAST_DAY_DATA_FILE) in status_result.stdout:
                 commit_message = f"[BOT] Update temperature data for {target_date}"
                 subprocess.run(['git', 'commit', '-m', commit_message], check=True)
