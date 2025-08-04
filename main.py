@@ -282,7 +282,7 @@ def main():
                 print(f" -> 커밋 생성: {commit_message}")
                 
                 # 4. 푸시
-                subprocess.run(['git', 'push'], check=True)
+                subprocess.run(['git', 'push', 'origin', 'main'], check=True) # 'origin main' 명시적으로 지정
                 print(" -> Git 저장소에 성공적으로 푸시했습니다.")
             else:
                 print(" -> 변경사항이 없어 커밋을 건너뜁니다.")
