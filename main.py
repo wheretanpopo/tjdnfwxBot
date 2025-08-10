@@ -4,6 +4,8 @@
 
 import datetime
 import json
+import os
+import subprocess # git 명령 실행을 위해 추가
 from pathlib import Path
 from zoneinfo import ZoneInfo # 시간대 정보 라이브러리
 
@@ -219,30 +221,33 @@ def main():
         else:
             print(f" -> ❌ {lang.upper()} 이미지 생성 실패")
 
-    # 8. Instagram 포스팅
-    print(f"\n6. Instagram 포스팅 시작...")
-    
-    if not generated_images:
-        print("❌ 생성된 이미지가 없어 Instagram 포스팅을 건너뜁니다.")
-    else:
-        print(f"   생성된 이미지: {list(generated_images.keys())}")
+    # 8. Instagram 포스팅 (GitHub Actions 환경에서만 실행)
+    if os.getenv('CI') == 'true':
+        print(f"\n6. Instagram 포스팅 시작...")
         
-        # Instagram API 인스턴스 생성
-        if all([INSTAGRAM_ACCESS_TOKEN, INSTAGRAM_USER_ID, IMGUR_CLIENT_ID]):
-            instagram_api = InstagramAPI(INSTAGRAM_ACCESS_TOKEN, INSTAGRAM_USER_ID, IMGUR_CLIENT_ID)
-            
-            # 일일 날씨 포스팅 실행
-            posting_success = post_daily_weather(instagram_api, generated_images, lang_data)
-            
-            if posting_success:
-                print("✅ Instagram 포스팅 완료!")
-            else:
-                print("❌ Instagram 포스팅 중 일부 실패")
+        if not generated_images:
+            print("❌ 생성된 이미지가 없어 Instagram 포스팅을 건너뜁니다.")
         else:
-            print("❌ Instagram API 설정이 부족합니다. 포스팅을 건너뜁니다.")
-            print(f"   - ACCESS_TOKEN: {'✅' if INSTAGRAM_ACCESS_TOKEN else '❌'}")
-            print(f"   - USER_ID: {'✅' if INSTAGRAM_USER_ID else '❌'}")
-            print(f"   - IMGUR_CLIENT_ID: {'✅' if IMGUR_CLIENT_ID else '❌'}")
+            print(f"   생성된 이미지: {list(generated_images.keys())}")
+            
+            # Instagram API 인스턴스 생성
+            if all([INSTAGRAM_ACCESS_TOKEN, INSTAGRAM_USER_ID, IMGUR_CLIENT_ID]):
+                instagram_api = InstagramAPI(INSTAGRAM_ACCESS_TOKEN, INSTAGRAM_USER_ID, IMGUR_CLIENT_ID)
+                
+                # 일일 날씨 포스팅 실행
+                posting_success = post_daily_weather(instagram_api, generated_images, lang_data)
+                
+                if posting_success:
+                    print("✅ Instagram 포스팅 완료!")
+                else:
+                    print("❌ Instagram 포스팅 중 일부 실패")
+            else:
+                print("❌ Instagram API 설정이 부족합니다. 포스팅을 건너뜁니다.")
+                print(f"   - ACCESS_TOKEN: {'✅' if INSTAGRAM_ACCESS_TOKEN else '❌'}")
+                print(f"   - USER_ID: {'✅' if INSTAGRAM_USER_ID else '❌'}")
+                print(f"   - IMGUR_CLIENT_ID: {'✅' if IMGUR_CLIENT_ID else '❌'}")
+    else:
+        print(f"\n6. 로컬 환경에서는 Instagram 포스팅을 건너뜁니다.")
 
     # 9. 오늘 최고/최저 기온 저장 (원시 데이터에서 직접 계산)
     print(f"\n7. 데이터 저장 중...")
@@ -254,8 +259,45 @@ def main():
         'yesterday_max_temp': temp_max_for_save,
         'yesterday_min_temp': temp_min_for_save
     }
+    print(f"[DEBUG] today_temps_to_save: {today_temps_to_save}") # 디버그 출력 추가
     if today_temps_to_save['yesterday_max_temp'] is not None:
         save_today_temps(today_temps_to_save)
+        print(f"[DEBUG] last_day_data.json content after save: {load_yesterday_temps()}") # 디버그 출력 추가
+        
+        # --- Git에 변경사항 커밋 및 푸시 (GitHub Actions 환경에서만 실행) ---
+        if os.getenv('CI') == 'true':
+            print("\n8. 변경된 기온 데이터 Git에 저장 중...")
+            try:
+                # 1. Git 사용자 설정
+                subprocess.run(['git', 'config', '--global', 'user.name', 'github-actions[bot]'], check=True)
+                subprocess.run(['git', 'config', '--global', 'user.email', 'github-actions[bot]@users.noreply.github.com'], check=True)
+                
+                # 2. 파일 스테이징
+                subprocess.run(['git', 'add', str(LAST_DAY_DATA_FILE)], check=True)
+                
+                # 3. 변경사항 확인 및 커밋
+                status_result = subprocess.run(['git', 'status', '--porcelain'], capture_output=True, text=True)
+                print(f"[DEBUG] git status --porcelain output: {status_result.stdout}") # 디버그 출력 추가
+                # 파일 경로를 상대 경로로 변환하고 슬래시를 통일하여 비교
+                file_path_for_git_status = str(LAST_DAY_DATA_FILE.relative_to(BASE_DIR)).replace('\\', '/')
+                # 'M  ' (modified, staged) 상태로 파일이 있는지 확인
+                if f"M  {file_path_for_git_status}" in status_result.stdout:
+                    commit_message = f"[BOT] Update temperature data for {target_date}"
+                    subprocess.run(['git', 'commit', '-m', commit_message], check=True)
+                    print(f" -> 커밋 생성: {commit_message}")
+                    
+                    # 4. 푸시
+                    subprocess.run(['git', 'push', 'origin', 'main'], check=True) # 'origin main' 명시적으로 지정
+                    print(" -> Git 저장소에 성공적으로 푸시했습니다.")
+                else:
+                    print(" -> 변경사항이 없어 커밋을 건너뜁니다.")
+
+            except subprocess.CalledProcessError as e:
+                print(f"❌ Git 작업 실패: {e}")
+            except Exception as e:
+                print(f"❌ 예상치 못한 오류 발생: {e}")
+        else:
+            print("\n8. 로컬 환경에서는 Git 자동 커밋/푸시를 건너뜁니다.")
     
     print("\n" + "="*50)
     print("Weather Service Completed Successfully! 🎉")

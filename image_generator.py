@@ -406,7 +406,7 @@ class ImageGenerator:
         # 강수량 텍스트 (값이 0.1 미만일 경우 특별 처리)
         rain_amount_value = ws.get('total_rain_amount', 0)
         if rain_amount_value < 0.1:
-            rain_amount_text = "1mm 미만" if language == 'ko' else "Less than 1mm"
+            rain_amount_text = "Less than 1mm"
         else:
             rain_amount_text = f"{rain_amount_value:.1f}mm"
 
@@ -469,11 +469,11 @@ class ImageGenerator:
                 self._draw_text(img, warning_text, warning_config, language)
         else:
             # 일반 날씨: 기본 위치 사용
-            date_config = pos.get("date", {}).
+            date_config = pos.get("date", {})
             if date_config:
                 self._draw_text(img, date_text, date_config, language)
             
-            catch_phrase_config = pos.get("catch_phrase", {}).
+            catch_phrase_config = pos.get("catch_phrase", {})
             if catch_phrase_config:
                 self._draw_text(img, phrase, catch_phrase_config, language)
 

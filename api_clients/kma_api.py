@@ -24,7 +24,7 @@ def get_weather_forecast(api_key, base_date, base_time, nx, ny):
         if response.status_code == 200 and response.text.strip():
             print("Requesting KMA API...")
             data = response.json()
-            print(f"Forecast API Response Data: {data}") # Debug print
+            # print(f"Forecast API Response Data: {data}") # Debug print
             return data
         else:
             print(f"❌ 기상청 API 응답 오류 (상태 코드: {response.status_code})")

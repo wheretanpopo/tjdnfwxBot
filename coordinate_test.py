@@ -7,8 +7,10 @@ from pathlib import Path
 import json
 
 def test_coordinates():
-    # 기본 경로 설정
-    base_dir = Path("D:/Documents/Gemini_Projects/MyFirstGeminiApp/weather_service")
+    # 기본 경로 설정 (스크립트 위치 기반 동적 경로)
+    # main.py나 image_generator.py와 동일한 방식으로, 테스트 파일의 위치를 기준으로 경로를 설정합니다.
+    script_root = Path(__file__).parent # 이 파일(coordinate_test.py)이 있는 프로젝트 루트
+    base_dir = script_root / "weather_service"
     templates_dir = base_dir / "templates" / "posts"
     fonts_dir = base_dir / "fonts"
     config_dir = base_dir / "config"

@@ -229,54 +229,28 @@ class InstagramAPI:
     def _generate_dynamic_weather_summary(self, weather_data, warnings, language='ko'):
         """날씨 데이터를 기반으로 동적 요약 문장을 생성합니다."""
         if not weather_data:
-            return "날씨 정보를 요약할 수 없습니다." if language == 'ko' else "Could not summarize weather information."
+            return "날씨 정보를 요약할 수 없습니다."
 
-        main_description = weather_data.get('description', '알 수 없음')
+        base_description = weather_data.get('base_description') # 새로 추가된 키
         rain_prob_max = weather_data.get('rain_prob_max', 0)
         
         summary_parts = []
 
-        if language == 'ko':
-            if warnings and warnings.get('type'):
-                # 특보가 있을 경우 특보를 중심으로 문장 구성
-                summary_parts.append(f"현재 {warnings['type']} {warnings['level']}가 발효 중입니다.")
-                # 특보가 폭염인데 비가 올 가능성이 있다면 추가 설명
-                if warnings['type'] == '폭염' and rain_prob_max >= 30:
-                    summary_parts.append(f"비 올 확률은 약 {rain_prob_max}%입니다.")
-                elif warnings['type'] == '호우' and rain_prob_max < 30:
-                    summary_parts.append(f"하지만 강수 확률은 낮습니다 (약 {rain_prob_max}%).")
-                # 그 외 일반 날씨 설명은 특보가 없을 때만 사용
-            else:
-                # 특보가 없을 경우 일반 날씨 설명
-                desc_ko = main_description.replace('요', '고').replace('맑고', '맑고,').replace('흐리고', '흐리고,')
-                summary_parts.append(f"오늘 서울은 대체로 {desc_ko} 날씨가 예상됩니다.")
-                if rain_prob_max >= 50:
-                    summary_parts.append(f"비 올 확률이 높습니다 (약 {rain_prob_max}%).")
-                elif rain_prob_max >= 30:
-                    summary_parts.append(f"비 올 가능성이 있습니다 (약 {rain_prob_max}%).")
-            
-            summary = " ".join(summary_parts)
-            return summary
+        # 한국어 문구만 생성
+        if warnings and warnings.get('type'):
+            summary_parts.append(f"현재 {warnings['type']} {warnings['level']}가 발효 중입니다.")
 
-        else: # English
-            if warnings and warnings.get('type'):
-                level_en = 'Advisory' if warnings.get('level') == '주의보' else 'Warning'
-                type_en_map = {'폭염': 'Heatwave', '호우': 'Heavy Rain', '태풍': 'Typhoon'}
-                type_en = type_en_map.get(warnings['type'], 'Weather')
-                summary_parts.append(f"A {type_en} {level_en} is currently in effect.")
-                if warnings['type'] == '폭염' and rain_prob_max >= 30:
-                    summary_parts.append(f"There is also a {rain_prob_max}% chance of rain.")
-                elif warnings['type'] == '호우' and rain_prob_max < 30:
-                    summary_parts.append(f"However, the chance of rain is low (approx. {rain_prob_max}%). ")
-            else:
-                summary_parts.append(f"Today in Seoul, the weather will be {main_description.lower()}. ")
-                if rain_prob_max >= 50:
-                    summary_parts.append(f"There is a high chance of rain (approx. {rain_prob_max}%). ")
-                elif rain_prob_max >= 30:
-                    summary_parts.append(f"There is a possibility of rain (approx. {rain_prob_max}%). ")
-            
-            summary = " ".join(summary_parts)
-            return summary
+        if base_description:
+            summary_parts.append(f"오늘 서울은 대체로 {base_description} 날씨가 예상됩니다.")
+        
+        if rain_prob_max >= 50:
+            summary_parts.append(f"비 올 확률이 높습니다 (약 {rain_prob_max}%).")
+        elif rain_prob_max >= 30:
+            summary_parts.append(f"비 올 가능성이 있습니다 (약 {rain_prob_max}%).")
+
+        # 최종 문장 조합
+        summary = " ".join(summary_parts)
+        return summary
 
     def create_caption_for_carousel(self, lang_data, primary_lang='ko'):
         """

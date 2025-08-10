@@ -117,7 +117,7 @@
       "rain_amount": {
         "x": 207,
         "y": 960,
-        "font_name": "Inter_24pt-SemiBold",
+        "font_name": "Inter_18pt-Regular",
         "font_size": 16,
         "color": "#000000",
         "align": "center"
@@ -242,8 +242,8 @@
         "align": "center"
       },
       "moon_phase": {
-        "x": 965, 
-        "y": 1220, 
+        "x": 967, 
+        "y": 1223, 
         "font_name": "Inter_18pt-Regular",
         "font_name_ko": "NanumSquareNeo-bRg", 
         "font_size": 14, 
@@ -253,7 +253,7 @@
       },
       "activity_index_am": {
         "x": 227,
-        "y": 1192,
+        "y": 1193,
         "font_name": "Inter_18pt-Regular",
         "font_name_ko": "NanumSquareNeo-bRg",
         "font_size": 19,
@@ -262,7 +262,7 @@
       },
       "activity_index_pm": {
         "x": 227,
-        "y": 1222,
+        "y": 1223,
         "font_name": "Inter_18pt-Regular",
         "font_name_ko": "NanumSquareNeo-bRg",
         "font_size": 19,
