@@ -339,7 +339,7 @@ class WeatherPhraseGenerator:
             # **우선순위 재정렬**: 불쾌지수를 더 높은 우선순위로 이동
             # 극심한 불쾌지수 (최우선) - 폭염 + 습도 조합
             if (discomfort_level == '매우 높음' and 
-                temperature_state in ['EXTREME', 'VERY_HOT']):
+                temperature_state in ['EXTREME']):
                 phrases = self.extreme_hot_humid_phrases.copy()
                 if discomfort_index:
                     phrases.append(f"불쾌지수 {int(discomfort_index)}. 찜통이야")

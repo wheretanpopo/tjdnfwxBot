@@ -264,40 +264,37 @@ def main():
         save_today_temps(today_temps_to_save)
         print(f"[DEBUG] last_day_data.json content after save: {load_yesterday_temps()}") # 디버그 출력 추가
         
-        # --- Git에 변경사항 커밋 및 푸시 (GitHub Actions 환경에서만 실행) ---
-        if os.getenv('CI') == 'true':
-            print("\n8. 변경된 기온 데이터 Git에 저장 중...")
-            try:
-                # 1. Git 사용자 설정
-                subprocess.run(['git', 'config', '--global', 'user.name', 'github-actions[bot]'], check=True)
-                subprocess.run(['git', 'config', '--global', 'user.email', 'github-actions[bot]@users.noreply.github.com'], check=True)
+        # --- Git에 변경사항 커밋 및 푸시 ---
+        print("\n8. 변경된 기온 데이터 Git에 저장 중...")
+        try:
+            # 1. Git 사용자 설정
+            subprocess.run(['git', 'config', '--global', 'user.name', 'github-actions[bot]'], check=True)
+            subprocess.run(['git', 'config', '--global', 'user.email', 'github-actions[bot]@users.noreply.github.com'], check=True)
+            
+            # 2. 파일 스테이징
+            subprocess.run(['git', 'add', str(LAST_DAY_DATA_FILE)], check=True)
+            
+            # 3. 변경사항 확인 및 커밋
+            status_result = subprocess.run(['git', 'status', '--porcelain'], capture_output=True, text=True)
+            print(f"[DEBUG] git status --porcelain output: {status_result.stdout}") # 디버그 출력 추가
+            # 파일 경로를 상대 경로로 변환하고 슬래시를 통일하여 비교
+            file_path_for_git_status = str(LAST_DAY_DATA_FILE.relative_to(BASE_DIR)).replace('\\', '/')
+            # 'M  ' (modified, staged) 상태로 파일이 있는지 확인
+            if f"M  {file_path_for_git_status}" in status_result.stdout:
+                commit_message = f"[BOT] Update temperature data for {target_date}"
+                subprocess.run(['git', 'commit', '-m', commit_message], check=True)
+                print(f" -> 커밋 생성: {commit_message}")
                 
-                # 2. 파일 스테이징
-                subprocess.run(['git', 'add', str(LAST_DAY_DATA_FILE)], check=True)
-                
-                # 3. 변경사항 확인 및 커밋
-                status_result = subprocess.run(['git', 'status', '--porcelain'], capture_output=True, text=True)
-                print(f"[DEBUG] git status --porcelain output: {status_result.stdout}") # 디버그 출력 추가
-                # 파일 경로를 상대 경로로 변환하고 슬래시를 통일하여 비교
-                file_path_for_git_status = str(LAST_DAY_DATA_FILE.relative_to(BASE_DIR)).replace('\\', '/')
-                # 'M  ' (modified, staged) 상태로 파일이 있는지 확인
-                if f"M  {file_path_for_git_status}" in status_result.stdout:
-                    commit_message = f"[BOT] Update temperature data for {target_date}"
-                    subprocess.run(['git', 'commit', '-m', commit_message], check=True)
-                    print(f" -> 커밋 생성: {commit_message}")
-                    
-                    # 4. 푸시
-                    subprocess.run(['git', 'push', 'origin', 'main'], check=True) # 'origin main' 명시적으로 지정
-                    print(" -> Git 저장소에 성공적으로 푸시했습니다.")
-                else:
-                    print(" -> 변경사항이 없어 커밋을 건너뜁니다.")
+                # 4. 푸시
+                subprocess.run(['git', 'push', 'origin', 'main'], check=True) # 'origin main' 명시적으로 지정
+                print(" -> Git 저장소에 성공적으로 푸시했습니다.")
+            else:
+                print(" -> 변경사항이 없어 커밋을 건너뜁니다.")
 
-            except subprocess.CalledProcessError as e:
-                print(f"❌ Git 작업 실패: {e}")
-            except Exception as e:
-                print(f"❌ 예상치 못한 오류 발생: {e}")
-        else:
-            print("\n8. 로컬 환경에서는 Git 자동 커밋/푸시를 건너뜁니다.")
+        except subprocess.CalledProcessError as e:
+            print(f"❌ Git 작업 실패: {e}")
+        except Exception as e:
+            print(f"❌ 예상치 못한 오류 발생: {e}")
     
     print("\n" + "="*50)
     print("Weather Service Completed Successfully! 🎉")

@@ -118,7 +118,7 @@
         "x": 207,
         "y": 960,
         "font_name": "Inter_18pt-Regular",
-        "font_size": 16,
+        "font_size": 18,
         "color": "#000000",
         "align": "center"
       },
@@ -151,7 +151,7 @@
         "y": 960, 
         "font_name": "Inter_18pt-Regular",
         "font_name_ko": "NanumSquareNeo-bRg", 
-        "font_size": 16, 
+        "font_size": 18, 
         "color": "#000000", 
         "align": "center"
       },

@@ -134,7 +134,7 @@ def get_complete_astro_info(api_key, target_date, location="서울"):
                 print(f" → 월령 정보 확인: {result['moon_age']}")
                 
                 # [기능 복원] 월령에 따른 상세 정보 분류
-                result["moon_phase_ko"] = classify_moon_phase(result["moon_age"])
+                result["moon_phase_ko"] = classify_moon_phase(result['moon_age'])
                 
                 phase_map = {
                     "초승달": ("Waxing Crescent", "🌒"),

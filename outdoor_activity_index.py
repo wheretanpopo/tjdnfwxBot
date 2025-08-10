@@ -6,11 +6,11 @@
 # =======================================
 REASON_MAPPING_EN = {
     "temperature": "High Temp",
-    "humidity": "High Humidity",
+    "humidity": "Humid",
     "wind": "Strong Wind",
     "precipitation": "Rain Likely",
     "air_quality": "Bad Air",
-    "uv_index": "High UV Index",
+    "uv_index": "Strong UV",
     "sky": "Too Sunny"
 }
 
