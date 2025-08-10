@@ -277,9 +277,9 @@ class InstagramAPI:
             "All weather information is generated daily at 5:30 AM.",
             "In particular, weather advisories/warnings (such as heat waves or heavy rain) reflect the status as of that time. Please note that any advisories issued or lifted after this time may not be reflected.",
             "",
-            "#WeatherForecast #Seoul #DailyWeather",
-            "#날씨예보 #서울날씨 #오늘의날씨 #서울",
-            "#WeatherUpdate #KoreaWeather #Weather"
+            "#WeatherForecast #Seoul #SeoulWeather #DailyWeather",
+            "#날씨예보 #서울날씨 #오늘의날씨 #서울 #한국 #서울여행 #한국여행",
+            "#WeatherUpdate #KoreaWeather #Weather #SeoulTravel"
         ]
         
         return "\n".join(caption_parts)
