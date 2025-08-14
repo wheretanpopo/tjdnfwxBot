@@ -237,7 +237,7 @@ def process_weather_warnings(warning_api_data):
 
     # 처리할 특보와 우선순위 정의 (낮을수록 우선순위 높음)
     priority_warnings = {
-        '태풍': 1, '폭염': 2, '호우': 3, # 템플릿이 바뀌는 최우선 특보
+        '태풍': 1, '호우': 2, '폭염': 3, # 템플릿이 바뀌는 최우선 특보
         '한파': 4, '대설': 5, '강풍': 6, '건조': 7 # 말뭉치로 처리할 특보
     }
     detected_warnings = []
@@ -246,24 +246,30 @@ def process_weather_warnings(warning_api_data):
         # getPwnStatus API의 특보 내용은 't6' 필드에 있음
         warning_content = item.get('t6', '')
         
-        # 서울 지역에 해당하는 특보만 필터링 (t6 내용에 '서울'이 포함된 경우)
-        if '서울' in warning_content:
-            for key in priority_warnings.keys():
-                if key in warning_content:
-                    level = '알수없음'
-                    if '경보' in warning_content:
-                        level = '경보'
-                    elif '주의보' in warning_content:
-                        level = '주의보'
-                    
-                    detected_warnings.append({'type': key, 'level': level, 'priority': priority_warnings[key]})
-                    # 하나의 warning_content에서 여러 특보가 중복 감지되는 것을 방지
-                    break 
+        # API 응답에서 각 특보는 줄바꿈(\r\n 또는 \n)으로 구분될 수 있음
+        # 일관된 처리를 위해 \r\n을 \n으로 통일하고, \n을 기준으로 나눔
+        warning_lines = warning_content.replace('\r\n', '\n').split('\n')
+        
+        for line in warning_lines:
+            # 라인 앞뒤의 공백 제거 후 내용이 있는지 확인
+            line = line.strip()
+            if '서울' in line and line:
+                for key, priority in priority_warnings.items():
+                    if key in line:
+                        level = '알수없음'
+                        if '경보' in line:
+                            level = '경보'
+                        elif '주의보' in line:
+                            level = '주의보'
+                        
+                        detected_warnings.append({'type': key, 'level': level, 'priority': priority})
+                        # 한 라인에서는 하나의 특보만 감지되면 되므로 break
+                        break 
     
     if not detected_warnings:
         return None
 
-    # 우선순위가 가장 높은 특보를 선택 (숫자가 낮을수록 높음)
+    # 감지된 모든 서울 특보 중 우선순위가 가장 높은 것을 선택
     best_warning = min(detected_warnings, key=lambda x: x['priority'])
     
     # 최종 결과에서 priority 키는 제거하여 반환
