@@ -6,6 +6,8 @@ import datetime
 import json
 import os
 import subprocess # git 명령 실행을 위해 추가
+import time  # 재시도 대기를 위해 추가
+import sys   # 실패 시 프로그램 종료를 위해 추가
 from pathlib import Path
 from zoneinfo import ZoneInfo # 시간대 정보 라이브러리
 
@@ -91,35 +93,78 @@ def main():
     """
     메인 실행 함수
     """
+    # -- 설정값 --
+    MAX_RETRIES = 3  # API 데이터 수집 최대 재시도 횟수
+    RETRY_DELAY_SECONDS = 30  # 재시도 간격 (초)
+
     # 1. 날짜 및 시간 설정 (한국 시간 기준)
     kst = ZoneInfo("Asia/Seoul")
     base_date, base_time = get_base_datetime()
     target_date = datetime.datetime.now(kst).strftime("%Y%m%d")
-    yesterday_temps = load_yesterday_temps() # 어제 최고/최저 기온 모두 로드
-    
+    yesterday_temps = load_yesterday_temps()
+
     print("="*50)
     print(f"Weather Service Started for {target_date}")
     print(f"Base Time: {base_date} {base_time}")
     print("="*50)
 
-    # 2. API 데이터 수집
+    # 2. API 데이터 수집 (재시도 로직 포함)
     print("1. 모든 API 요청 중...")
-    raw_weather_data = kma_api.get_weather_forecast(KMA_API_KEY, base_date, base_time, SEOUL_NX, SEOUL_NY)
-    raw_uv_data = kasi_api.get_uv_index(KASI_API_KEY, SEOUL_AREA_ID, target_date)
-    raw_warning_data = kma_api.get_weather_warnings(KMA_API_KEY, target_date)
-    search_date_for_air = f"{target_date[:4]}-{target_date[4:6]}-{target_date[6:]}"
-    raw_air_forecast_pm10 = airkorea_api.get_air_forecast(AIRKOREA_API_KEY, search_date_for_air, inform_code='PM10')
-    raw_air_forecast_pm25 = airkorea_api.get_air_forecast(AIRKOREA_API_KEY, search_date_for_air, inform_code='PM25')
-    astro_info = get_complete_astro_info(KASI_API_KEY, target_date, "서울")
-    print(" -> 모든 API 호출 완료.")
+    all_data = None
+    for attempt in range(MAX_RETRIES):
+        print(f" -> 데이터 수집 시도 ({attempt + 1}/{MAX_RETRIES})...")
+        
+        # 모든 API를 호출하여 원시 데이터를 가져옵니다.
+        raw_weather_data = kma_api.get_weather_forecast(KMA_API_KEY, base_date, base_time, SEOUL_NX, SEOUL_NY)
+        raw_uv_data = kasi_api.get_uv_index(KASI_API_KEY, SEOUL_AREA_ID, target_date)
+        raw_warning_data = kma_api.get_weather_warnings(KMA_API_KEY, target_date)
+        search_date_for_air = f"{target_date[:4]}-{target_date[4:6]}-{target_date[6:]}"
+        raw_air_forecast_pm10 = airkorea_api.get_air_forecast(AIRKOREA_API_KEY, search_date_for_air, inform_code='PM10')
+        raw_air_forecast_pm25 = airkorea_api.get_air_forecast(AIRKOREA_API_KEY, search_date_for_air, inform_code='PM25')
+        astro_info = get_complete_astro_info(KASI_API_KEY, target_date, "서울")
+
+        # 데이터 검증: 포스트 생성에 필수적인 데이터가 정상적으로 수신되었는지 확인합니다.
+        # 기상청 단기예보(날씨, 기온)와 천문정보(일출/일몰)는 포스트의 핵심 정보이므로 반드시 필요합니다.
+        is_valid = (
+            raw_weather_data and raw_weather_data.get('response', {}).get('body') and
+            astro_info and astro_info.get('sunrise')
+        )
+
+        if is_valid:
+            print(" -> 모든 필수 데이터 수집 성공.")
+            # 수집된 모든 데이터를 하나의 딕셔너리로 묶습니다.
+            all_data = {
+                "weather": raw_weather_data,
+                "uv": raw_uv_data,
+                "warnings": raw_warning_data,
+                "air_pm10": raw_air_forecast_pm10,
+                "air_pm25": raw_air_forecast_pm25,
+                "astro": astro_info
+            }
+            break  # 데이터 수집에 성공했으므로 재시도 루프를 탈출합니다.
+        
+        # 재시도 횟수가 남아있을 경우, 다음 시도 전에 잠시 대기합니다.
+        if attempt < MAX_RETRIES - 1:
+            print(f" -> 필수 데이터 누락. {RETRY_DELAY_SECONDS}초 후 재시도합니다.")
+            time.sleep(RETRY_DELAY_SECONDS)
+    
+    # 최종 확인: 모든 재시도 후에도 데이터 수집에 실패했다면, 에러를 기록하고 프로그램을 종료합니다.
+    if not all_data:
+        print("="*50)
+        print("❌ 최종 데이터 수집 실패. 프로그램을 종료합니다.")
+        print("="*50)
+        sys.exit(1) # 스크립트를 비정상 종료시켜, 불완전한 포스트가 생성되는 것을 막습니다.
+
+    print(" -> 모든 API 호출 및 검증 완료.")
 
     # 3. 데이터 가공
     print("\n2. 원시 데이터 처리 중...")
-    processed_today = process_weather_data(raw_weather_data, target_date)
-    uv_index = process_uv_index(raw_uv_data)
-    warnings = process_weather_warnings(raw_warning_data)
-    air_quality_pm10 = process_air_forecast(raw_air_forecast_pm10, pollutant_type='PM10')
-    air_quality_pm25 = process_air_forecast(raw_air_forecast_pm25, pollutant_type='PM25')
+    processed_today = process_weather_data(all_data["weather"], target_date)
+    uv_index = process_uv_index(all_data["uv"])
+    warnings = process_weather_warnings(all_data["warnings"])
+    air_quality_pm10 = process_air_forecast(all_data["air_pm10"], pollutant_type='PM10')
+    air_quality_pm25 = process_air_forecast(all_data["air_pm25"], pollutant_type='PM25')
+    astro_info = all_data["astro"] # 천문 정보는 이미 가공된 상태입니다.
     print(" -> 데이터 처리 완료.")
 
     # 4. 최종 분석
